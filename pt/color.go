@@ -6,19 +6,20 @@ import (
 )
 
 var (
-	Black = Color{}
-	White = Color{1, 1, 1}
+	Black = Color{0, 0, 0, 1}
+	White = Color{1, 1, 1, 1}
 )
 
 type Color struct {
-	R, G, B float64
+	R, G, B, A float64
 }
 
 func HexColor(x int) Color {
+	a := float64((x>>24)&0xff) / 255
 	r := float64((x>>16)&0xff) / 255
 	g := float64((x>>8)&0xff) / 255
 	b := float64((x>>0)&0xff) / 255
-	return Color{r, g, b}.Pow(2.2)
+	return Color{r, g, b, a}.Pow(2.2)
 }
 
 func Kelvin(K float64) Color {
@@ -64,70 +65,72 @@ func Kelvin(K float64) Color {
 	red = math.Min(1, red/255)
 	green = math.Min(1, green/255)
 	blue = math.Min(1, blue/255)
-	return Color{red, green, blue}
+	return Color{red, green, blue, 1}
 }
 
 func NewColor(c color.Color) Color {
 	r, g, b, _ := c.RGBA()
-	return Color{float64(r) / 65535, float64(g) / 65535, float64(b) / 65535}
+	return Color{float64(r) / 65535, float64(g) / 65535, float64(b) / 65535, 1}
 }
 
-func (a Color) RGBA() color.RGBA {
-	r := uint8(math.Max(0, math.Min(255, a.R*255)))
-	g := uint8(math.Max(0, math.Min(255, a.G*255)))
-	b := uint8(math.Max(0, math.Min(255, a.B*255)))
-	return color.RGBA{r, g, b, 255}
+func (c Color) RGBA() color.RGBA {
+	r := uint8(math.Max(0, math.Min(255, c.R*255)))
+	g := uint8(math.Max(0, math.Min(255, c.G*255)))
+	b := uint8(math.Max(0, math.Min(255, c.B*255)))
+	a := uint8(math.Max(0, math.Min(255, c.A*255)))
+	return color.RGBA{r, g, b, a}
 }
 
-func (a Color) RGBA64() color.RGBA64 {
-	r := uint16(math.Max(0, math.Min(65535, a.R*65535)))
-	g := uint16(math.Max(0, math.Min(65535, a.G*65535)))
-	b := uint16(math.Max(0, math.Min(65535, a.B*65535)))
-	return color.RGBA64{r, g, b, 65535}
+func (c Color) RGBA64() color.RGBA64 {
+	r := uint16(math.Max(0, math.Min(65535, c.R*65535)))
+	g := uint16(math.Max(0, math.Min(65535, c.G*65535)))
+	b := uint16(math.Max(0, math.Min(65535, c.B*65535)))
+	a := uint16(math.Max(0, math.Min(65535, c.A*65535)))
+	return color.RGBA64{r, g, b, a}
 }
 
-func (a Color) Add(b Color) Color {
-	return Color{a.R + b.R, a.G + b.G, a.B + b.B}
+func (c Color) Add(b Color) Color {
+	return Color{c.R + b.R, c.G + b.G, c.B + b.B, c.A + b.A}
 }
 
-func (a Color) Sub(b Color) Color {
-	return Color{a.R - b.R, a.G - b.G, a.B - b.B}
+func (c Color) Sub(b Color) Color {
+	return Color{c.R - b.R, c.G - b.G, c.B - b.B, c.A - b.A}
 }
 
-func (a Color) Mul(b Color) Color {
-	return Color{a.R * b.R, a.G * b.G, a.B * b.B}
+func (c Color) Mul(b Color) Color {
+	return Color{c.R * b.R, c.G * b.G, c.B * b.B, c.A * b.A}
 }
 
-func (a Color) MulScalar(b float64) Color {
-	return Color{a.R * b, a.G * b, a.B * b}
+func (c Color) MulScalar(b float64) Color {
+	return Color{c.R * b, c.G * b, c.B * b, c.A * b}
 }
 
-func (a Color) DivScalar(b float64) Color {
-	return Color{a.R / b, a.G / b, a.B / b}
+func (c Color) DivScalar(b float64) Color {
+	return Color{c.R / b, c.G / b, c.B / b, c.A / b}
 }
 
-func (a Color) Min(b Color) Color {
-	return Color{math.Min(a.R, b.R), math.Min(a.G, b.G), math.Min(a.B, b.B)}
+func (c Color) Min(b Color) Color {
+	return Color{math.Min(c.R, b.R), math.Min(c.G, b.G), math.Min(c.B, b.B), math.Min(c.A, b.A)}
 }
 
-func (a Color) Max(b Color) Color {
-	return Color{math.Max(a.R, b.R), math.Max(a.G, b.G), math.Max(a.B, b.B)}
+func (c Color) Max(b Color) Color {
+	return Color{math.Max(c.R, b.R), math.Max(c.G, b.G), math.Max(c.B, b.B), math.Min(c.A, b.A)}
 }
 
-func (a Color) MinComponent() float64 {
-	return math.Min(math.Min(a.R, a.G), a.B)
+func (c Color) MinComponent() float64 {
+	return math.Min(math.Min(c.R, c.G), c.B)
 }
 
-func (a Color) MaxComponent() float64 {
-	return math.Max(math.Max(a.R, a.G), a.B)
+func (c Color) MaxComponent() float64 {
+	return math.Max(math.Max(c.R, c.G), c.B)
 }
 
-func (a Color) Pow(b float64) Color {
-	return Color{math.Pow(a.R, b), math.Pow(a.G, b), math.Pow(a.B, b)}
+func (c Color) Pow(b float64) Color {
+	return Color{math.Pow(c.R, b), math.Pow(c.G, b), math.Pow(c.B, b), math.Pow(c.A, b)}
 }
 
-func (a Color) Mix(b Color, pct float64) Color {
-	a = a.MulScalar(1 - pct)
+func (c Color) Mix(b Color, pct float64) Color {
+	c = c.MulScalar(1 - pct)
 	b = b.MulScalar(pct)
-	return a.Add(b)
+	return c.Add(b)
 }

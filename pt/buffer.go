@@ -101,7 +101,7 @@ func (b *Buffer) Image(channel Channel) image.Image {
 				c = b.Pixels[y*b.W+x].StandardDeviation()
 			case SamplesChannel:
 				p := float64(b.Pixels[y*b.W+x].Samples) / maxSamples
-				c = Color{p, p, p}
+				c = Color{p, p, p, 1.0}
 			}
 			result.SetRGBA64(x, y, c.RGBA64())
 		}

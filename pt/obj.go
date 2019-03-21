@@ -123,12 +123,12 @@ func LoadMTL(path string, parent Material, materials map[string]*Material) error
 			c := ParseFloats(args)
 			max := math.Max(math.Max(c[0], c[1]), c[2])
 			if max > 0 {
-				material.Color = Color{c[0] / max, c[1] / max, c[2] / max}
+				material.Color = Color{c[0] / max, c[1] / max, c[2] / max, 1}
 				material.Emittance = max
 			}
 		case "Kd":
 			c := ParseFloats(args)
-			material.Color = Color{c[0], c[1], c[2]}
+			material.Color = Color{c[0], c[1], c[2], 1}
 		case "map_Kd":
 			p := RelativePath(path, args[0])
 			material.Texture = GetTexture(p)
